@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Lenovo\Desktop\AI_project\ai_project
+set VIRTUAL_ENV=C:\Users\Lenovo\AI Sem 4\AI_FINAL_PROJECT\ai_project
 
 if not defined PROMPT set PROMPT=$P$G
 

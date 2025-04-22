@@ -2,14 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Documents</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
-    />
+    <title>InceptionV3 Image Classifier</title>
   </head>
   <body>
-    <h1>Welcome to our Bertrand</h1>
+    <h2>Upload an image</h2>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" required />
+      <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+    <h3>Prediction: {{ prediction }}</h3>
+    <img src="{{ image_url }}" alt="Uploaded Image" style="max-width: 300px" />
+    {% endif %}
   </body>
 </html>
