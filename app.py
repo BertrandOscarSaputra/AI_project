@@ -6,34 +6,41 @@ import numpy as np
 import os
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads/'
+model = load_model("./Model/inceptionv3_model.h5", compile=False)
 
-# Load model
-model = load_model('./Model/inceptionv3_model.h5')
-
-# Replace with your actual class names
-class_names = ['benign', 'malignant']
-
-def model_predict(img_path, model):
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = preprocess_input(img_array)
-
-    preds = model.predict(img_array)
-    predicted_class = class_names[np.argmax(preds)]
-    return predicted_class
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(filepath)
-            prediction = model_predict(filepath, model)
-            return render_template('index.html', prediction=prediction, image_url=filepath)
-    return render_template('index.html', prediction=None)
+    prediction = None
+    confidence = None
+    img_path = None
 
-if __name__ == '__main__':
+    if request.method == "POST":
+        img_file = request.files["image"]
+        if img_file:
+            img_path = os.path.join("static", img_file.filename)
+            img_file.save(img_path)
+
+            # Load and preprocess the image
+            img = image.load_img(img_path, target_size=(224, 224))  # 224x224 for your model
+            img_array = image.img_to_array(img)
+            img_array = np.expand_dims(img_array, axis=0)
+            img_array = preprocess_input(img_array)  # Normalize the image
+
+            # Make prediction
+            preds = model.predict(img_array)
+
+            # Convert prediction to label and confidence
+            class_names = ["benign", "malignant"]
+
+            confidence = round(float(preds[0][0]) * 100, 2)
+
+            if preds[0][0] > 0.5:
+                prediction = class_names[1]  # malignant
+            else:
+                prediction = class_names[0]  # benign
+                confidence = 100 - confidence  # flip confidence for benign
+
+    return render_template("index.html", prediction=prediction, confidence=confidence, img_path=img_path)
+
+if __name__ == "__main__":
     app.run(debug=True)
