@@ -38,7 +38,7 @@ def index():
                 prediction = class_names[1]  # malignant
             else:
                 prediction = class_names[0]  # benign
-                confidence = 100 - confidence  # flip confidence for benign
+                confidence = 100 - confidence 
 
     return render_template("index.html", prediction=prediction, confidence=confidence, img_path=img_path)
 
