@@ -4,15 +4,39 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 import numpy as np
 import os
+from google import genai
 
+# Set up Gemini client
+client = genai.Client(api_key="AIzaSyAvGclmgjqfF9kT_7m76doTJuNiJ4JB_z0")
 
 app = Flask(__name__)
 model = load_model("./Model/inceptionv3_model.h5", compile=False)
+
+def generate_explanation(prediction, confidence):
+    try:
+        prompt = (
+            f"The AI model classified the skin lesion as '{prediction.upper()}' with a confidence of {confidence}%. "
+            f"Explain clearly and concisely why the lesion is likely {prediction}. "
+            f"Break down the explanation into clear, readable paragraphs. "
+            f"Include common characteristics of {prediction} skin lesions. "
+            f"Format the response with clear sections or bullet points for easy reading, like a medical summary."
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+
+        return response.text.strip()
+    except Exception as e:
+        return f"Explanation generation failed: {e}"
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     prediction = None
     confidence = None
+    explanation = None
     img_path = None
 
     if request.method == "POST":
@@ -29,16 +53,25 @@ def index():
             preds = model.predict(img_array)
 
             class_names = ["benign", "malignant"]
-
             confidence = round(float(preds[0][0]) * 100, 2)
 
             if preds[0][0] > 0.5:
-                prediction = class_names[1]  
+                prediction = class_names[1]
             else:
-                prediction = class_names[0]  
-                confidence = 100 - confidence 
+                prediction = class_names[0]
+                confidence = 100 - confidence
 
-    return render_template("index.html", prediction=prediction, confidence=confidence, img_path=img_path)
+            explanation = generate_explanation(prediction, confidence)
+
+    # For GET method (i.e., page refresh), all values remain None
+    return render_template(
+        "index.html",
+        prediction=prediction,
+        confidence=confidence,
+        explanation=explanation,
+        img_path=img_path
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True)

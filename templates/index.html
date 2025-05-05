@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Melanoma Cancer Detection</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -13,7 +17,7 @@
   <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Melanoma Cancer Detection</a>
+        <a class="navbar-brand fw-bold" href="#">Melanoma Cancer Detection</a>
         <div class="collapse navbar-collapse justify-content-end">
           <ul class="navbar-nav">
             <li class="nav-item">
@@ -75,40 +79,62 @@
       </div>
     </div>
 
-    <div class="container py-5">
-      <div class="card shadow-sm p-4">
-        <h1 class="mb-4 text-center">Upload an Image</h1>
-        <form
-          method="POST"
-          enctype="multipart/form-data"
-          class="d-flex flex-column align-items-center gap-3"
-        >
-          <input
-            type="file"
-            name="image"
-            class="form-control"
-            accept=".jpg,.jpeg,.png"
-            required
-          />
-          <button type="submit" class="btn btn-primary mt-3">Predict</button>
-        </form>
-
-        {% if prediction %}
-        <div class="mt-5 text-center">
-          <h2 class="text-success">Prediction: {{ prediction }}</h2>
-          <h4 class="text-secondary">Confidence: {{ confidence }}%</h4>
-          <div class="mt-3">
-            <img
-              src="{{ img_path }}"
-              alt="Uploaded Image"
-              class="img-fluid rounded"
-              style="max-width: 300px"
+    <main>
+      <div class="container py-5">
+        <div class="card shadow-sm p-4">
+          <h1 class="mb-4 text-center">Upload an Image</h1>
+          <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="d-flex flex-column align-items-center gap-3"
+          >
+            <input
+              type="file"
+              name="image"
+              class="form-control"
+              accept=".jpg,.jpeg,.png"
+              required
             />
+            <button type="submit" class="btn btn-primary mt-3">Predict</button>
+          </form>
+
+          {% if prediction %}
+          <div class="mt-5 text-center">
+            <!-- Conditional styling for prediction text -->
+            <h2
+              class="text-{{ 'danger' if prediction == 'malignant' else 'success' }}"
+            >
+              Prediction: {{ prediction }}
+            </h2>
+            <h4 class="text-secondary">Confidence: {{ confidence }}%</h4>
+
+            <div class="mt-3">
+              <img
+                src="{{ img_path }}"
+                alt="Uploaded Image"
+                class="img-fluid rounded"
+                style="max-width: 300px"
+              />
+            </div>
+
+            {% if explanation %}
+            <div class="explanation mt-4 text-start">
+              <h3>AI Explanation</h3>
+              <div
+                class="border p-3 rounded bg-white"
+                style="white-space: pre-line"
+              >
+                {{ explanation | safe }}
+              </div>
+            </div>
+
+            {% endif %}
           </div>
+
+          {% endif %}
         </div>
-        {% endif %}
       </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-primary text-white text-center py-3 mt-5">
