@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Melanoma Cancer Detection</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <style>
+      body {
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .sidebar {
+        width: 250px;
+        background-color: #0d6efd;
+        color: white;
+        padding-top: 1.5rem;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+      .sidebar a {
+        color: white;
+        padding: 10px 20px;
+        display: block;
+        text-decoration: none;
+      }
+      .sidebar a:hover {
+        background-color: #0b5ed7;
+      }
+      .content {
+        flex-grow: 1;
+        background-color: #f8f9fa;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h4 class="text-center fw-bold mb-4">
+        <i class="bi bi-activity me-2"></i>Melanoma
+      </h4>
+      <a href="#"><i class="bi bi-house-door me-2"></i> Home</a>
+      <a href="#upload"><i class="bi bi-upload me-2"></i> Upload</a>
+      <a href="#about"><i class="bi bi-info-circle me-2"></i> About</a>
+      <a href="#" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="bi bi-question-circle me-2"></i> Help</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Hero Section -->
+      <section class="bg-white py-5 border-bottom text-center">
+        <h1 class="display-5 fw-bold text-primary">Melanoma Cancer Detection</h1>
+        <p class="lead text-secondary mt-3">
+          Upload your skin lesion image and let AI assist you in identifying potential melanoma.
+        </p>
+      </section>
+
+<!-- Benign vs. Malignant Section -->
+<section class="py-5 bg-light border-top">
+  <div class="container">
+    <h4 class="text-center mb-4 text-dark fw-bold">Benign vs. Malignant Melanoma</h4>
+    
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-4 text-center">
+        <img src="{{ url_for('static', filename='uploads/benign.png') }}" alt="Benign" class="img-fluid rounded shadow-sm mb-2" />
+
+        <p class="fw-semibold text-dark">Benign</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <img src="{{ url_for('static', filename='uploads/melanoma.png') }}" alt="Benign" class="img-fluid rounded shadow-sm mb-2" />
+        <p class="fw-semibold text-dark">Malignant</p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-10">
+        <p class="text-muted text-center">
+          Melanoma skin cancer can be <strong>benign</strong> (unlikely to spread or cause harm) or <strong>malignant</strong> (likely to spread to other parts of the body). 
+          Recognizing the differences is essential for early detection and effective treatment.
+        </p>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+          <h5 class="text-primary">Ciri-ciri Benign (Jinak):</h5>
+          <ul class="text-muted">
+            <li>Simetris</li>
+            <li>Batas tegas dan rata</li>
+            <li>Warna seragam (biasanya cokelat muda/tua)</li>
+            <li>Ukuran kecil (&lt; 6 mm)</li>
+            <li>Tidak berubah dari waktu ke waktu</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6 mt-4 mt-md-0">
+        <div class="p-4 bg-white rounded shadow-sm h-100">
+          <h5 class="text-danger">Ciri-ciri Malignant (Ganas):</h5>
+          <ul class="text-muted">
+            <li><strong>A</strong>symmetry: bentuk tidak simetris</li>
+            <li><strong>B</strong>order: tepi tidak rata</li>
+            <li><strong>C</strong>olor: warna campur (hitam, merah, coklat, biru)</li>
+            <li><strong>D</strong>iameter: lebih dari 6 mm</li>
+            <li><strong>E</strong>volving: berubah bentuk/warna/ukuran</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+      <!-- Image Upload Form -->
+      <section class="bg-light py-5 border-top" id="upload">
+      <div class="container py-5">
+        <div class="card shadow-sm p-4 border-0">
+          <h3 class="mb-4 text-center text-dark">Upload an Image for Analysis</h3>
+          <form method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center gap-3">
+            <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png" required />
+            <button type="submit" class="btn btn-primary mt-3">
+              <i class="bi bi-search"></i> Predict
+            </button>
+          </form>
+
+          {% if prediction %}
+          <div class="mt-5 text-center">
+            <h4 class="text-success">Prediction: {{ prediction }}</h4>
+            <h5 class="text-secondary">Confidence: {{ confidence }}%</h5>
+            <div class="mt-3">
+              <img src="{{ img_path }}" alt="Uploaded Image" class="img-thumbnail" style="max-width: 300px" />
+            </div>
+            {% if explanation %}
+            <div class="mt-4 text-start">
+              <h5 class="text-primary">Explanation:</h5>
+              <div class="alert alert-info" style="white-space: pre-line;">
+                {{ explanation }}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+ <!-- About Section -->
+<section class="bg-light py-5 border-top" id="about">
+  <div class="container">
+    <h4 class="text-center text-dark mb-4">What is Melanoma?</h4>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <p class="text-muted">
+          <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+          Melanoma is a type of skin cancer that can be deadly if not detected early. It typically appears as an unusual mole or pigmented area and can spread to other parts of the body. Early detection through image-based classification can significantly increase survival chances.
+        </p>
+      </div>
+    </div>
+
+    <!-- Melanoma Warning Signs -->
+    <div class="text-center mt-5">
+      <h2 class="text-danger fw-bold">MELANOMA WARNING SIGNS</h2>
+      <p class="text-muted">What you need to know about early signs of skin cancer.</p>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-10">
+        <p class="text-muted">
+          Finding melanoma at an early stage is crucial; early detection can vastly increase your chances for cure.
+          Look for anything new, changing or unusual on both sun-exposed and sun-protected areas of the body. Melanomas commonly appear on the legs of women. The number one place they develop on men is the trunk. Keep in mind, though, that melanomas can arise anywhere on the skin, even in areas where the sun doesn’t shine.
+        </p>
+        <p class="text-muted">
+          Most moles, brown spots and growths on the skin are harmless – but not always. The ABCDEs and the Ugly Duckling sign can help you detect melanoma.
+        </p>
+      </div>
+    </div>
+
+    <div class="text-center my-4">
+      <img src="{{ url_for('static', filename='uploads/melonawarning.png') }}" alt="melonawarning" class="img-fluid rounded shadow-sm mb-2" />
+    </div>
+
+    <!-- ABCDEs of Melanoma -->
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <h5 class="text-primary fw-bold">The ABCDEs of melanoma:</h5>
+        <p class="text-muted">The first five letters of the alphabet are a guide to help you recognize the warning signs of melanoma.</p>
+        <ul class="text-muted">
+          <li><strong>A is for Asymmetry:</strong> Most melanomas are asymmetrical. If you draw a line through the middle of the lesion, the two halves don’t match.</li>
+          <li><strong>B is for Border:</strong> Melanoma borders tend to be uneven and may have scalloped or notched edges.</li>
+          <li><strong>C is for Color:</strong> Multiple colors are a warning sign. Melanomas may have different shades of brown, tan, black, red, white or blue.</li>
+          <li><strong>D is for Diameter or Dark:</strong> A lesion the size of a pencil eraser (about 6 mm) or darker than others is a warning sign.</li>
+          <li><strong>E is for Evolving:</strong> Any change in size, shape, color, or new symptoms like bleeding, itching, or crusting is a warning.</li>
+        </ul>
+        <p class="text-muted">
+          If you notice these warning signs or see anything NEW, CHANGING, or UNUSUAL on your skin, see a dermatologist promptly.
+        </p>
+      </div>
+    </div>
+
+    <div class="row text-center my-4">
+      <div class="col-md-2">
+        <img src="{{ url_for('static', filename='uploads/A.png') }}" class="img-fluid rounded shadow-sm" alt="A - Asymmetry" />      </div>
+        <div class="col-md-2">
+          <img src="{{ url_for('static', filename='uploads/B.png') }}" class="img-fluid rounded shadow-sm" alt="B - Border" />
+        </div>
+        <div class="col-md-2">
+          <img src="{{ url_for('static', filename='uploads/C.png') }}" class="img-fluid rounded shadow-sm" alt="C - Color" />
+        </div>
+        <div class="col-md-2">
+          <img src="{{ url_for('static', filename='uploads/D.png') }}" class="img-fluid rounded shadow-sm" alt="D - Diameter" />
+        </div>
+        <div class="col-md-2">
+          <img src="{{ url_for('static', filename='uploads/E.png') }}" class="img-fluid rounded shadow-sm" alt="E - Evolving" />
+        </div>
+        <div class="col-md-2">
+          <img src="{{ url_for('static', filename='uploads/E1.png') }}" class="img-fluid rounded shadow-sm" alt="E - Evolving" />
+        </div>
+    <p class="text-muted text-center">
+      Please note: Since not all melanomas have the same appearance, these photos serve as a general reference. If you see anything NEW, CHANGING or UNUSUAL on your skin, get checked by a dermatologist.
+    </p>
+
+    <!-- Ugly Duckling Sign -->
+    <div class="mt-5">
+      <h5 class="text-danger fw-bold">Look out for an Ugly Duckling:</h5>
+      <p class="text-muted">
+        The Ugly Duckling is another warning sign of melanoma. This recognition strategy is based on the concept that most normal moles on your body resemble one another, while melanomas stand out. Compare suspicious spots to surrounding moles to identify differences.
+      </p>
+      <div class="text-center">
+        <img src="{{ url_for('static', filename='uploads/ugly.png') }}" alt="ulgly" class="img-fluid rounded shadow-sm mb-2" />
+      </div>
+    </div>
+
+    <!-- Melanoma Variants -->
+    <div class="mt-5">
+      <h5 class="text-primary fw-bold">Melanoma can be tricky:</h5>
+      <p class="text-muted">
+        Identifying a potential skin cancer is not easy, and not all melanomas follow the rules. About 20–30% develop in existing moles, while 70–80% arise on seemingly normal skin.
+      </p>
+      <p class="text-muted">
+        Amelanotic melanomas lack pigment, making them hard to recognize. They may be pinkish, red, white, skin-colored, or clear. Acral lentiginous melanoma (ALM), common in people of color, often appears in hidden areas like under nails or on palms/soles.
+      </p>
+      <div class="text-center">
+        <img src="{{ url_for('static', filename='uploads/melanomavarian.png') }}" alt="melanomavarian" class="img-fluid rounded shadow-sm mb-2" />
+      </div>
+      <p class="text-muted mt-3">
+        Be watchful for any new mole or freckle, a sore that doesn't heal, or any spot that changes or looks unusual.
+      </p>
+    </div>
+
+    <!-- What You Can Do -->
+    <div class="mt-5">
+      <h5 class="text-success fw-bold">What You Can Do:</h5>
+      <p class="text-muted">
+        Check your skin head-to-toe monthly for new or changing moles. If in doubt, get it checked by a doctor.
+        Monthly self-exams are important, but see your dermatologist at least once a year. If you’ve had melanoma, stick to your doctor’s follow-up plan.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+      <!-- Help Modal -->
+      <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="helpModalLabel">How to Use</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>To classify an image using the InceptionV3 model:</p>
+              <ol>
+                <li>Click the "Choose File" button to upload a .jpg or .png image.</li>
+                <li>Click the "Predict" button to analyze the image.</li>
+                <li>The prediction result and confidence level will appear below.</li>
+              </ol>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-primary text-white text-center py-3">
+        <small>&copy; 2025 Kelompok 5 AI</small>
+      </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
