@@ -91,14 +91,3 @@ Script ini akan menampilkan hasil akurasi, loss, serta metrik evaluasi lainnya.
 | `sample_02.png` | 🟥 **Malignant** | 93.8% |
 
 ---
-
-## 👨‍💻 Pengembang  
-Dikembangkan oleh **Bertrand Oscar Saputra**  
-Proyek ini bertujuan untuk membantu deteksi dini kanker payudara melalui teknologi **Artificial Intelligence (AI)** berbasis citra medis.
-
----
-
-## 📜 Lisensi  
-Proyek ini bersifat **Open Source** dan dapat digunakan untuk keperluan akademik, penelitian, maupun pengembangan lebih lanjut dengan tetap mencantumkan atribusi kepada pengembang asli.
-
----
